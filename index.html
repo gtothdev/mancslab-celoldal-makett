@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MancsLab céloldal-makett</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1d3a6b; --navy-2:#2a4f8f; --green:#6fb532; --green-d:#5a9a25;
+  --ink:#1b1f29; --muted:#5d6577; --line:#e4e8ef; --bg:#f4f6fa; --card:#fff;
+  --warn:#fff7e0; --warn-line:#f0c24a; --ph:#8a5cf6;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+img{max-width:100%;display:block}
+button{font:inherit;cursor:pointer}
+a{color:var(--navy-2)}
+
+/* ---------- control bar (not part of the mockup) ---------- */
+.ctl{position:sticky;top:0;z-index:50;background:#11182b;color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.ctl b{font-weight:700}
+.ctl .grp{display:flex;gap:6px;flex-wrap:wrap}
+.ctl button{background:#253150;color:#cfd7ea;border:0;border-radius:8px;padding:7px 12px;font-size:14px}
+.ctl button[aria-pressed=true]{background:var(--green);color:#fff}
+.ctl small{color:#9aa6c2;font-size:12px}
+.legend{max-width:1100px;margin:14px auto 0;padding:0 16px;font-size:13px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+/* ---------- stage ---------- */
+.stage{padding:18px 16px 60px;display:flex;justify-content:center}
+.frame{width:100%;max-width:1100px;background:var(--card);border-radius:14px;box-shadow:0 10px 40px rgba(20,30,60,.12);overflow:hidden;position:relative;transition:max-width .25s}
+.stage.mobile .frame{max-width:390px;border-radius:28px;border:8px solid #11182b}
+.stage.mobile .frame .scroller{height:780px;overflow-y:auto;overflow-x:hidden}
+.view{display:none}.view.on{display:block}
+
+/* ---------- annotations ---------- */
+.note{position:relative}
+.note::after{content:attr(data-n);position:absolute;top:-10px;right:-6px;background:#e5484d;color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;box-shadow:0 0 0 2px #fff;z-index:3}
+body.no-notes .note::after{display:none}
+.ph{outline:2px dashed var(--ph);outline-offset:2px;border-radius:6px}
+body.no-notes .ph{outline:none}
+.fold{position:absolute;left:0;right:0;border-top:2px dashed #e5484d;pointer-events:none;z-index:4}
+.fold span{position:absolute;right:8px;top:-22px;background:#e5484d;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px}
+body.no-notes .fold{display:none}
+.stage:not(.mobile) .fold{display:none}
+
+/* ---------- shop header ---------- */
+.annbar{background:var(--navy);color:#fff;font-size:13px;text-align:center;padding:7px 12px}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--line)}
+.hdr img{height:34px}
+.hdr .icons{display:flex;gap:14px;align-items:center}
+.cartbtn{position:relative;background:none;border:0;padding:4px}
+.cartbtn i{position:absolute;top:-4px;right:-6px;background:var(--green);color:#fff;font-style:normal;font-size:11px;font-weight:700;border-radius:10px;padding:0 6px;display:none}
+.icon{width:24px;height:24px;stroke:var(--ink);fill:none;stroke-width:2}
+
+/* ---------- product page ---------- */
+.pdp{display:grid;grid-template-columns:1.05fr 1fr;gap:34px;padding:26px 28px}
+.stage.mobile .pdp{grid-template-columns:1fr;gap:14px;padding:12px 14px}
+.gal{position:relative}
+.gal .main{border-radius:14px;background:#eef2f8;aspect-ratio:4/3;object-fit:cover;width:100%}
+.stage.mobile .gal .main{aspect-ratio:16/10}
+.thumbs{display:flex;gap:8px;margin-top:8px}
+.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:2px solid transparent;background:#eef2f8;cursor:pointer}
+.thumbs img.on{border-color:var(--navy)}
+.stage.mobile .thumbs{display:none}
+.badge-top{position:absolute;left:10px;top:10px;background:#fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+h1.pt{font-size:28px;line-height:1.2;margin:0 0 6px;font-weight:800;color:var(--navy)}
+.stage.mobile h1.pt{font-size:21px}
+.sub{color:var(--muted);margin:0 0 10px;font-size:15px}
+.rating{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:10px}
+.stars{color:#f5a623;letter-spacing:1px}
+.usp{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px}
+.usp span{background:#eef6e6;color:#2f5f10;font-size:13px;font-weight:600;padding:5px 10px;border-radius:999px}
+.pack{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 12px}
+.opt{border:2px solid var(--line);border-radius:12px;padding:12px;background:#fff;text-align:left;position:relative}
+.opt[aria-checked=true]{border-color:var(--navy);box-shadow:0 0 0 3px rgba(29,58,107,.12)}
+.opt b{display:block;font-size:15px}
+.opt .pr{font-size:18px;font-weight:800;color:var(--navy)}
+.opt small{display:block;color:var(--muted);font-size:12px}
+.opt .tag{position:absolute;top:-10px;right:10px;background:var(--green);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
+.buyrow{display:flex;gap:10px;align-items:stretch}
+.qty{display:flex;border:2px solid var(--line);border-radius:12px;overflow:hidden}
+.qty button{background:#fff;border:0;width:36px;font-size:18px}
+.qty input{width:38px;border:0;text-align:center;font:inherit;font-weight:700}
+.atc{flex:1;background:var(--green);color:#fff;border:0;border-radius:12px;font-weight:800;font-size:17px;padding:14px;box-shadow:0 6px 16px rgba(111,181,50,.35)}
+.atc:hover{background:var(--green-d)}
+.trust{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:13px;color:var(--muted)}
+.trust div{display:flex;gap:6px;align-items:flex-start}
+.trust b{color:var(--ink)}
+.sec{padding:22px 28px;border-top:1px solid var(--line)}
+.stage.mobile .sec{padding:18px 14px}
+.sec h2{font-size:21px;margin:0 0 12px;color:var(--navy)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stage.mobile .steps{grid-template-columns:1fr}
+.step{background:var(--bg);border-radius:12px;padding:14px}
+.step b{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;margin-bottom:6px}
+.reviews{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stage.mobile .reviews{grid-template-columns:1fr}
+.rev{border:1px solid var(--line);border-radius:12px;padding:14px;font-size:14px}
+.rev .who{color:var(--muted);font-size:12px;margin-top:6px}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:8px}
+summary{font-weight:600;cursor:pointer}
+.sticky{position:sticky;bottom:0;z-index:5;background:#fff;border-top:1px solid var(--line);padding:10px 14px;display:none;gap:10px;align-items:center;box-shadow:0 -6px 20px rgba(0,0,0,.06)}
+.stage.mobile .sticky.show{display:flex}
+.sticky .sp{font-weight:800;color:var(--navy);font-size:17px;white-space:nowrap}
+.sticky .atc{padding:12px;font-size:16px}
+
+/* ---------- blog ---------- */
+.art{max-width:760px;margin:0 auto;padding:26px 28px 10px}
+.stage.mobile .art{padding:14px}
+.crumb{font-size:13px;color:var(--muted)}
+.art h1{font-size:32px;line-height:1.2;color:var(--navy);margin:8px 0}
+.stage.mobile .art h1{font-size:23px}
+.meta{font-size:13px;color:var(--muted);margin-bottom:12px}
+.art h2{font-size:22px;color:var(--navy);margin:26px 0 8px}
+.art p,.art li{font-size:16.5px}
+.toc{background:var(--bg);border-radius:12px;padding:12px 16px;font-size:14px}
+.toc ol{margin:6px 0 0;padding-left:18px}
+.box{border:2px solid var(--navy);border-radius:16px;padding:16px;margin:18px 0;background:linear-gradient(180deg,#f6f9ff,#fff)}
+.box .row{display:flex;gap:14px;align-items:center}
+.box .row img{width:92px;height:92px;object-fit:cover;border-radius:12px;background:#eef2f8;flex:none}
+.box h3{margin:0 0 4px;font-size:18px;color:var(--navy)}
+.box p{margin:0;font-size:14px;color:var(--muted)}
+.mini{display:flex;align-items:center;gap:10px;background:#eef6e6;border-radius:12px;padding:10px 14px;margin:14px 0;font-size:15px}
+.mini .atc{flex:none;padding:9px 14px;font-size:14px;box-shadow:none}
+.symp{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0;list-style:none}
+.stage.mobile .symp{grid-template-columns:1fr}
+.symp li{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:15px}
+.vet{background:#fff1f1;border-left:4px solid #e5484d;padding:10px 14px;border-radius:8px;font-size:15px}
+
+/* ---------- drawer ---------- */
+.drawer{position:absolute;inset:0;background:rgba(10,15,30,.45);display:none;z-index:20}
+.drawer.on{display:block}
+.drawer .pan{position:absolute;right:0;top:0;bottom:0;width:min(380px,100%);background:#fff;padding:18px;display:flex;flex-direction:column;gap:12px}
+.drawer h3{margin:0;color:var(--navy)}
+.line{display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:10px}
+.line img{width:60px;height:60px;border-radius:10px;object-fit:cover;background:#eef2f8}
+.prog{height:8px;background:#eef2f8;border-radius:8px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--green)}
+.checkout{background:var(--navy);color:#fff;border:0;border-radius:12px;padding:14px;font-weight:800;font-size:16px}
+.x{background:none;border:0;font-size:22px;position:absolute;right:14px;top:10px}
+
+/* ---------- notes panel ---------- */
+.notes{max-width:1100px;margin:0 auto;padding:0 16px 40px}
+.notes .card{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 4px 18px rgba(20,30,60,.06)}
+.notes h2{margin:0 0 10px;font-size:18px}
+.notes ol{margin:0;padding-left:20px}
+.notes li{margin-bottom:6px}
+.view-notes{display:none}.view-notes.on{display:block}
+@media (max-width:720px){
+  .pdp{grid-template-columns:1fr;gap:14px;padding:12px 14px}
+  .steps,.reviews,.symp{grid-template-columns:1fr}
+  .stage.mobile .frame{border-width:6px}
+  .ctl small{display:none}
+}
+footer.f{background:#11182b;color:#9aa6c2;font-size:13px;padding:18px 28px}
+</style>
+</head>
+<body>
+
+<div class="ctl">
+  <div><b>MancsLab – céloldal-makett</b> <small>· nem élő oldal, a gombok csak bemutatnak</small></div>
+  <div class="grp" role="group" aria-label="Oldal">
+    <button data-view="pdp" aria-pressed="true">Termékoldal</button>
+    <button data-view="blog" aria-pressed="false">Blogcikk vásárlással</button>
+  </div>
+  <div class="grp" role="group" aria-label="Eszköz">
+    <button data-dev="mobile" aria-pressed="true">Mobil</button>
+    <button data-dev="desktop" aria-pressed="false">Asztali</button>
+    <button id="tnotes" aria-pressed="true">Jelölések</button>
+  </div>
+</div>
+
+<div class="legend">
+  <span><i class="dot" style="background:#e5484d"></i>Piros szám = a lenti magyarázat pontja</span>
+  <span><i class="dot" style="outline:2px dashed var(--ph)"></i>Lila keret = helykitöltő, valós adattal kell feltölteni</span>
+  <span><i class="dot" style="background:#e5484d;height:2px"></i>Szaggatott piros vonal = a telefon első képernyőjének alja</span>
+</div>
+
+<div class="stage mobile" id="stage">
+ <div class="frame">
+  <div class="scroller" id="scroller">
+
+   <div class="annbar">Rendelés ma 14:00-ig → <span class="ph">holnap kiszállítva</span> · <span class="ph">Ingyenes szállítás 9 990 Ft felett</span></div>
+   <header class="hdr">
+     <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+     <img src="https://mancslab.hu/cdn/shop/files/mancslab-logo.png?width=300" alt="MancsLab">
+     <div class="icons">
+       <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+       <button class="cartbtn" data-open-cart aria-label="Kosár"><svg class="icon" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h11l2-8H6.2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg><i class="cnt">0</i></button>
+     </div>
+   </header>
+
+   <!-- ================= PRODUCT PAGE ================= -->
+   <main class="view on" id="v-pdp" style="position:relative">
+    <div class="fold" style="top:744px"><span>telefon első képernyőjének alja</span></div>
+    <section class="pdp">
+      <div class="gal note" data-n="1">
+        <span class="badge-top">🐶 🐱 Kutyának és macskának</span>
+        <img class="main" id="mainimg" src="https://cdn.shopify.com/s/files/1/1045/1009/5685/files/giardia-ag-giardia-antigen-gyorsteszt-kutyaknak-alapkep-sajat-doboz-kazetta.png?v=1791454641&width=900" alt="Giardia gyorsteszt doboz és tesztkazetta">
+        <div class="thumbs">
+          <img class="on" src="https://cdn.shopify.com/s/files/1/1045/1009/5685/files/giardia-ag-giardia-antigen-gyorsteszt-kutyaknak-alapkep-sajat-doboz-kazetta.png?v=1791454641&width=200" alt="">
+          <img src="https://cdn.shopify.com/s/files/1/1045/1009/5685/files/mancslab-giardia-gyorsteszt-kutya-macska-1db.png?v=1791385881&width=200" alt="">
+          <img src="https://cdn.shopify.com/s/files/1/1045/1009/5685/files/mancslab-giardia-gyorsteszt-kutya-macska-5db.png?v=1791385881&width=200" alt="">
+          <img src="https://cdn.shopify.com/s/files/1/1045/1009/5685/files/mancslab-giardia-safvet-tesztkazetta.png?v=1791526518&width=200" alt="">
+        </div>
+      </div>
+      <div>
+        <h1 class="pt note" data-n="2">Giardia gyorsteszt kutyának és macskának</h1>
+        <p class="sub">Otthon, székletmintából, <b>10 perc alatt</b> – mielőtt állatorvoshoz mész.</p>
+        <div class="rating note ph" data-n="3"><span class="stars">★★★★★</span><b>4,8</b><a href="#rev">(minta: 37 értékelés)</a></div>
+        <div class="usp">
+          <span>✓ 10 perces eredmény</span><span class="ph">✓ Antigén gyorsteszt</span><span class="ph">✓ Raktáron</span>
+        </div>
+        <div class="pack note" data-n="4" role="radiogroup" aria-label="Csomag">
+          <button class="opt" role="radio" aria-checked="true" data-pack="1" data-price="2990" data-title="Giardia gyorsteszt – 1 db">
+            <b>1 db</b><span class="pr">2 990 Ft</span><small>Egy állat, egy vizsgálat</small>
+          </button>
+          <button class="opt" role="radio" aria-checked="false" data-pack="5" data-price="13455" data-title="Giardia gyorsteszt – 5 db">
+            <span class="tag">−10%</span><b>5 db</b><span class="pr">13 455 Ft</span><small>2 691 Ft/db · kontroll a kezelés után</small>
+          </button>
+        </div>
+        <div class="buyrow note" data-n="5">
+          <div class="qty"><button data-q="-1" aria-label="Kevesebb">−</button><input id="qty" value="1" inputmode="numeric" aria-label="Mennyiség"><button data-q="1" aria-label="Több">+</button></div>
+          <button class="atc" data-add>Kosárba – <span class="atcp">2 990 Ft</span></button>
+        </div>
+        <div class="trust note" data-n="6">
+          <div>🚚 <span><b class="ph">1–2 munkanap</b><br><span class="ph">Foxpost / házhoz</span></span></div>
+          <div>💳 <span><b class="ph">Kártya, utánvét</b><br>biztonságos fizetés</span></div>
+          <div>🩺 <span><b class="ph">Állatorvosi háttér</b><br><span class="ph">útmutató a dobozban</span></span></div>
+          <div>↩️ <span><b>14 napos elállás</b><br>bontatlan termékre</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec note" data-n="7">
+      <h2>Mikor érdemes tesztelni?</h2>
+      <ul class="symp">
+        <li>💩 Visszatérő, zsíros, nyálkás hasmenés</li>
+        <li>⚖️ Fogyás jó étvágy mellett</li>
+        <li>🐾 Új kölyök vagy menhelyi örökbefogadás után</li>
+        <li>🔁 Kezelés után, a gyógyulás ellenőrzésére</li>
+      </ul>
+    </section>
+
+    <section class="sec">
+      <h2>Így működik</h2>
+      <div class="steps">
+        <div class="step"><b>1</b><div><strong>Mintavétel</strong><br>Kis székletmintát veszel a mellékelt pálcával.</div></div>
+        <div class="step"><b>2</b><div><strong>Csepegtetés</strong><br>A pufferoldatos mintát a kazettára csepegteted.</div></div>
+        <div class="step"><b>3</b><div><strong>Leolvasás</strong><br>10 perc múlva leolvasod: 1 csík negatív, 2 csík pozitív.</div></div>
+      </div>
+    </section>
+
+    <section class="sec note" data-n="8" id="rev">
+      <h2>Mit mondanak a vásárlók?</h2>
+      <div class="reviews">
+        <div class="rev ph"><span class="stars">★★★★★</span><br>Ide kerül egy valós vásárlói vélemény (Judge.me / Shopify Reviews).<div class="who">Minta – nem valós értékelés</div></div>
+        <div class="rev ph"><span class="stars">★★★★★</span><br>Ide kerül egy valós vásárlói vélemény a gyorsaságról vagy az egyszerűségről.<div class="who">Minta – nem valós értékelés</div></div>
+        <div class="rev ph"><span class="stars">★★★★☆</span><br>Ide kerül egy valós vélemény, lehetőleg macskatartótól.<div class="who">Minta – nem valós értékelés</div></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>Gyakori kérdések</h2>
+      <details><summary>Mennyire pontos a teszt?</summary><p class="ph">Ide a gyártói validáció számai kerülnek (szenzitivitás, specificitás), forrással.</p></details>
+      <details><summary>Kiváltja az állatorvost?</summary><p>Nem. Gyors szűrésre és a kezelés utáni kontrollra jó. Pozitív eredménynél vagy súlyos tüneteknél fordulj állatorvoshoz.</p></details>
+      <details><summary>Macskánál is használható?</summary><p>Igen, kutyánál és macskánál is.</p></details>
+    </section>
+
+    <div class="sticky" id="sticky">
+      <div><div style="font-size:12px;color:var(--muted)" class="stp">Giardia gyorsteszt – 1 db</div><div class="sp">2 990 Ft</div></div>
+      <button class="atc" data-add style="flex:1">Kosárba</button>
+    </div>
+   </main>
+
+   <!-- ================= BLOG ================= -->
+   <main class="view" id="v-blog" style="position:relative">
+    <div class="fold" style="top:744px"><span>telefon első képernyőjének alja</span></div>
+    <article class="art">
+      <div class="crumb">Tudástár › Giardia</div>
+      <h1>Giardia kutyánál: tünetek, széklet és otthoni teszt</h1>
+      <div class="meta"><span class="ph">Lektorálta: [állatorvos neve]</span> · 6 perc olvasás</div>
+
+      <div class="mini note" data-n="9">
+        <span style="flex:1">🧪 <b>Gyanús?</b> Teszteld otthon 10 perc alatt – <b>2 990 Ft</b></span>
+        <button class="atc" data-add data-fixed="1">Kosárba</button>
+      </div>
+
+      <div class="toc"><b>Tartalom</b>
+        <ol><li>Milyen tünetei vannak?</li><li>Milyen a giardiás széklet?</li><li>Hogyan tesztelhetem otthon?</li><li>Mikor kell állatorvoshoz menni?</li></ol>
+      </div>
+
+      <h2>Milyen tünetei vannak a Giardiának kutyánál?</h2>
+      <p>A leggyakoribb jel a visszatérő, puha vagy zsíros, gyakran nyálkás hasmenés. Sok kutya közben jó étvággyal eszik, mégis fogy. Kölyköknél és menhelyről érkezett kutyáknál gyakoribb.</p>
+      <ul class="symp">
+        <li>💩 Hullámzó, visszatérő hasmenés</li><li>🟡 Zsíros, világos, bűzös széklet</li><li>⚖️ Fogyás vagy lassú gyarapodás</li><li>💨 Puffadás, szelek</li>
+      </ul>
+
+      <div class="box note" data-n="10">
+        <div class="row">
+          <img src="https://cdn.shopify.com/s/files/1/1045/1009/5685/files/mancslab-giardia-gyorsteszt-kutya-macska-1db.png?v=1791385881&width=300" alt="Giardia gyorsteszt">
+          <div><h3>Felismered a tüneteket?</h3><p>Antigén gyorsteszt otthonra – kutyának és macskának, eredmény 10 perc alatt.</p></div>
+        </div>
+        <div class="pack" role="radiogroup" aria-label="Csomag" style="margin-top:12px">
+          <button class="opt" role="radio" aria-checked="true" data-pack="1" data-price="2990" data-title="Giardia gyorsteszt – 1 db"><b>1 db</b><span class="pr">2 990 Ft</span><small>egy vizsgálat</small></button>
+          <button class="opt" role="radio" aria-checked="false" data-pack="5" data-price="13455" data-title="Giardia gyorsteszt – 5 db"><span class="tag">−10%</span><b>5 db</b><span class="pr">13 455 Ft</span><small>kontrollra is</small></button>
+        </div>
+        <div class="buyrow"><button class="atc" data-add>Kosárba – <span class="atcp">2 990 Ft</span></button></div>
+        <div style="font-size:13px;color:var(--muted);margin-top:8px">🚚 <span class="ph">1–2 munkanap</span> · 💳 <span class="ph">kártya, utánvét</span> · ↩️ 14 nap elállás</div>
+      </div>
+
+      <h2>Milyen a giardiás kutya széklete?</h2>
+      <p>Jellemzően világos, zsíros fényű, puha vagy pépes, időnként nyálkás. A parazita nem minden mintában ürül, ezért egy negatív mikroszkópos vizsgálat sem zárja ki biztosan – az antigénteszt ezért hasznos kiegészítés.</p>
+
+      <h2>Hogyan tesztelhetem otthon?</h2>
+      <p>Kis székletmintát veszel, a pufferoldattal összekevered, és a kazettára csepegteted. 10 perc múlva leolvasod: egy csík negatív, két csík pozitív.</p>
+
+      <div class="mini">
+        <span style="flex:1">✅ <span class="ph">Kezelés utáni kontrollhoz</span> – <b>5 db: 2 691 Ft/db</b></span>
+        <button class="atc" data-add data-fixed="5">Kosárba</button>
+      </div>
+
+      <h2>Mikor kell azonnal állatorvoshoz menni?</h2>
+      <p class="vet">Véres széklet, hányás, bágyadtság, kiszáradás vagy kölyökkutya esetén ne várj a teszttel – azonnal fordulj állatorvoshoz.</p>
+
+      <p style="font-size:13px;color:var(--muted);margin-top:24px">A cikk szövege a makettben rövidített. A valós cikk tartalma a mancslab.hu tudástárában található.</p>
+    </article>
+
+    <div class="sticky" id="sticky2">
+      <div><div style="font-size:12px;color:var(--muted)">Giardia gyorsteszt</div><div class="sp">2 990 Ft-tól</div></div>
+      <button class="atc" data-add data-fixed="1" style="flex:1">Kosárba</button>
+    </div>
+   </main>
+
+   <footer class="f">MancsLab · makett – a végleges oldal a Shopify-témában készül</footer>
+  </div>
+
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="pan">
+      <button class="x" data-close aria-label="Bezárás">×</button>
+      <h3>Kosár</h3>
+      <div id="lines"></div>
+      <div id="shipinfo" style="font-size:13px"></div>
+      <div class="prog"><i id="progbar" style="width:0"></i></div>
+      <div style="display:flex;justify-content:space-between;font-weight:800;font-size:17px"><span>Összesen</span><span id="total">0 Ft</span></div>
+      <button class="checkout">Tovább a pénztárhoz →</button>
+      <div style="font-size:12px;color:var(--muted);text-align:center">Makett: a gomb nem indít rendelést.</div>
+    </div>
+  </div>
+ </div>
+</div>
+
+<div class="notes">
+ <div class="card view-notes on" id="n-pdp">
+  <h2>Mit javít ez a termékoldal?</h2>
+  <ol>
+    <li><b>Kisebb galéria mobilon.</b> 16:10-es kép, bélyegképek nélkül, így az ár és a gomb is felfér az első képernyőre. Most a gomb 1009 px-nél van, a képernyő 812 px.</li>
+    <li><b>A cím a keresési szándékot ismétli.</b> A hirdetésből érkező „giardia teszt” keresés ugyanazt a kifejezést látja, a „kutyának és macskának” már a címben ott van.</li>
+    <li><b>Csillagok és értékelésszám a hajtás felett.</b> Most nincs értékelés. Judge.me vagy Shopify Product Reviews kell hozzá, és a meglévő vásárlóktól e-mailben lehet kérni véleményt.</li>
+    <li><b>Csomagválasztó ár/db értékkel és kedvezménycímkével.</b> A valós árak: 2 990 Ft és 13 455 Ft.</li>
+    <li><b>A „Kosárba” gombon ott az ár.</b> Mobilon görgetés után ragadós sávként az alján marad.</li>
+    <li><b>Szállítás, fizetés, elállás közvetlenül a gomb alatt.</b> A lila mezőkbe a valós feltételek kerülnek.</li>
+    <li><b>Tünetlista.</b> A tünetekre keresők is magukra ismernek, ez a céloldal relevanciáját is javítja.</li>
+    <li><b>Valós vélemények helye.</b> Kitalált értékelést nem szabad kitenni, a lila kártyák csak a helyet jelölik.</li>
+  </ol>
+ </div>
+ <div class="card view-notes" id="n-blog">
+  <h2>Mit javít a vásárolható blogcikk?</h2>
+  <ol start="9">
+    <li><b>Felső mini-sáv.</b> Aki már eldöntötte, hogy tesztel, a cikk legelején egy kattintással kosárba teheti, nem kell végigolvasnia.</li>
+    <li><b>Termékdoboz a tünetlista után.</b> Itt a legmagasabb a vásárlási szándék. Csomagválasztó és Kosárba gomb van benne, és az olvasó nem hagyja el a cikket. Shopify-ban ez egy „Featured product” szekció a cikksablonban, vagy egy egyedi blokk a Shopify kosár-API-jával (/cart/add.js).</li>
+  </ol>
+  <p style="margin:10px 0 0">A cikk alján mobilon szintén ott a ragadós kosársáv. A Google Ads tünet-csoportjai (pl. „giardia tünetei”, „giardia széklet”) erre az oldalra mutatnának, a vásárlási szándékú kulcsszavak pedig a termékoldalra.</p>
+ </div>
+</div>
+
+<script>
+const fmt=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' Ft';
+const stage=document.getElementById('stage'),scroller=document.getElementById('scroller');
+let cart=[];
+// view + device toggles
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('[data-view]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.view));
+  document.querySelectorAll('.view-notes').forEach(v=>v.classList.toggle('on',v.id==='n-'+b.dataset.view));
+  scroller.scrollTop=0;window.scrollTo(0,0);onScroll();
+});
+document.querySelectorAll('[data-dev]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('[data-dev]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  stage.classList.toggle('mobile',b.dataset.dev==='mobile');onScroll();
+});
+document.getElementById('tnotes').onclick=e=>{const on=document.body.classList.toggle('no-notes');e.currentTarget.setAttribute('aria-pressed',!on)};
+// gallery
+document.querySelectorAll('.thumbs img').forEach(t=>t.onclick=()=>{document.querySelectorAll('.thumbs img').forEach(x=>x.classList.toggle('on',x===t));document.getElementById('mainimg').src=t.src.replace('width=200','width=900')});
+// pack selection (per group)
+function current(group){const o=group.querySelector('.opt[aria-checked=true]');return {pack:+o.dataset.pack,price:+o.dataset.price,title:o.dataset.title}}
+document.querySelectorAll('.pack').forEach(g=>g.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{
+  g.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-checked',x===o));
+  const c=current(g),q=+document.getElementById('qty').value||1;
+  const scope=g.closest('.box')||document.getElementById('v-pdp');
+  scope.querySelectorAll('.atcp').forEach(s=>s.textContent=fmt(c.price*(scope.id==='v-pdp'?q:1)));
+  if(scope.id==='v-pdp'){document.querySelector('#sticky .sp').textContent=fmt(c.price);document.querySelector('#sticky .stp').textContent=c.title}
+}));
+document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const i=document.getElementById('qty');i.value=Math.max(1,(+i.value||1)+(+b.dataset.q));const c=current(document.querySelector('#v-pdp .pack'));document.querySelector('#v-pdp .atcp').textContent=fmt(c.price*i.value)});
+// add to cart
+const P={1:{price:2990,title:'Giardia gyorsteszt – 1 db',img:'https://cdn.shopify.com/s/files/1/1045/1009/5685/files/mancslab-giardia-gyorsteszt-kutya-macska-1db.png?v=1791385881&width=200'},5:{price:13455,title:'Giardia gyorsteszt – 5 db',img:'https://cdn.shopify.com/s/files/1/1045/1009/5685/files/mancslab-giardia-gyorsteszt-kutya-macska-5db.png?v=1791385881&width=200'}};
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{
+  let pack,qty=1;
+  if(b.dataset.fixed)pack=+b.dataset.fixed;
+  else{const g=(b.closest('.box')||document.getElementById('v-pdp')).querySelector('.pack');pack=current(g).pack;if(!b.closest('.box'))qty=+document.getElementById('qty').value||1}
+  const ex=cart.find(l=>l.pack===pack);ex?ex.qty+=qty:cart.push({pack,qty});render();open();
+});
+const FREE=9990;
+function render(){
+  const tot=cart.reduce((s,l)=>s+P[l.pack].price*l.qty,0),n=cart.reduce((s,l)=>s+l.qty,0);
+  document.getElementById('lines').innerHTML=cart.map(l=>`<div class="line"><img src="${P[l.pack].img}" alt=""><div style="flex:1"><b>${P[l.pack].title}</b><div style="font-size:13px;color:var(--muted)">${l.qty} × ${fmt(P[l.pack].price)}</div></div><b>${fmt(P[l.pack].price*l.qty)}</b></div>`).join('');
+  document.getElementById('total').textContent=fmt(tot);
+  document.getElementById('progbar').style.width=Math.min(100,tot/FREE*100)+'%';
+  document.getElementById('shipinfo').innerHTML=tot>=FREE?'🎉 <b>Ingyenes szállítás</b> <span class="ph">(minta-határ)</span>':`Még <b>${fmt(FREE-tot)}</b> az ingyenes szállításig <span class="ph">(minta-határ)</span>`;
+  document.querySelectorAll('.cnt').forEach(c=>{c.textContent=n;c.style.display=n?'block':'none'});
+}
+const drawer=document.getElementById('drawer');
+function open(){drawer.classList.add('on');drawer.setAttribute('aria-hidden','false')}
+document.querySelectorAll('[data-open-cart]').forEach(b=>b.onclick=()=>{render();open()});
+drawer.onclick=e=>{if(e.target===drawer||e.target.hasAttribute('data-close')){drawer.classList.remove('on');drawer.setAttribute('aria-hidden','true')}};
+// sticky bar after main ATC scrolls out
+function onScroll(){
+  const mob=stage.classList.contains('mobile');
+  const sc=mob?scroller.scrollTop:0;
+  document.getElementById('sticky').classList.toggle('show',mob&&sc>620);
+  document.getElementById('sticky2').classList.toggle('show',mob&&sc>300);
+}
+scroller.addEventListener('scroll',onScroll);
+// the fold line marks the bottom of the phone's first screen
+function placeFold(){document.querySelectorAll('.view').forEach(v=>{const f=v.querySelector('.fold');if(f)f.style.top=(scroller.clientHeight-v.offsetTop)+'px'})}
+document.querySelectorAll('[data-view],[data-dev]').forEach(b=>b.addEventListener('click',placeFold));
+placeFold();
+</script>
+</body>
+</html>
